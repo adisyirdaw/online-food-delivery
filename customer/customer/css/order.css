@@ -1,0 +1,120 @@
+/* MODAL BACKGROUND */
+.order-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(6px) brightness(0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+/* MODAL BOX */
+.order-box {
+    position: relative;
+    background: rgba(255,255,255,0.95);
+    width: 90%;
+    max-width: 750px;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    animation: popup 0.4s ease;
+}
+
+/* CLOSE BUTTON */
+.order-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.order-close:hover {
+    color: #f08804;
+}
+
+/* POPUP ANIMATION */
+@keyframes popup {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* TITLE */
+.order-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1e2330;
+}
+
+/* FOOD SELECTED */
+.selected-food {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.selected-food img {
+    width: 140px;
+    border-radius: 14px;
+}
+
+.food-info h3 {
+    margin: 0;
+}
+
+.food-price {
+    color: #f08804;
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+/* FORM */
+.order-form input,
+.order-form textarea {
+    width: 100%;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.order-form textarea {
+    resize: none;
+    height: 90px;
+}
+
+.order-form button {
+    width: 100%;
+    background: #f08804;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.order-form button:hover {
+    background: #e07c00;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+    .selected-food {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
+
+

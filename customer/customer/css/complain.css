@@ -1,0 +1,68 @@
+/* Blur background when modal is open */
+body.modal-open > *:not(#complaintModal) {
+    filter: blur(5px);
+    pointer-events: none; /* prevent clicking background */
+}
+
+/* Keep modal clear */
+#complaintModal {
+    filter: none;
+    pointer-events: auto;
+}
+
+/* Modal container */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close:hover { color: #000; }
+
+.modal-content input, .modal-content select, .modal-content textarea, .modal-content button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.modal-content button {
+    background-color: #f6b11a;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.modal-content button:hover {
+    background-color: #1e2330
+}
+
+#messageBox {
+    margin-top: 10px;
+    color: green;
+    font-weight: bold;
+}

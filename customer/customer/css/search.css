@@ -1,0 +1,101 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Reset & font */
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+/* Food search results container */
+.food-menu {
+    padding: 40px 0;
+}
+
+.food-menu .container {
+    width: 90%;
+    margin: auto;
+}
+
+.food-menu-list,
+.food-menu-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+    align-items: stretch; /* equal height cards */
+}
+
+/* Each food card – fluid, same height, never bigger than 320 px */
+.food-menu-card,
+.food-menu-box {
+    flex: 1 1 clamp(260px, 30%, 320px);
+    max-width: 320px;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.food-menu-card:hover,
+.food-menu-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Image – fixed height */
+.food-menu-img img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Card info – fills remaining space, pushes button to bottom */
+.food-menu-info,
+.food-menu-desc {
+    padding: 16px;
+    background: #1e2330;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1 0 auto;
+    justify-content: space-between;
+}
+
+.food-menu-info h4,
+.food-menu-desc h4 {
+    font-size: 1.4rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* keeps title on one line */
+}
+
+.food-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.food-detail {
+    font-size: 0.95rem;
+    color: #cccccc;
+}
+
+/* Button */
+.btn-primary {
+    background: #f6b11a;
+    color: #fff;
+    padding: 8px 14px;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+.btn-primary:hover {
+    background: #926c19;
+}

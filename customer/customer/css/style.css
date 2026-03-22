@@ -1,0 +1,229 @@
+
+
+/* Reset & base */
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 80%;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 50px;
+    perspective: 800px;
+}
+
+/* Images */
+.img-responsive {
+    width: 100%;
+    object-fit: cover;
+}
+.img-curve {
+    border-radius: 15px;
+}
+
+/* Text helpers */
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-white { color: white; }
+.clearfix { clear: both; float: none; }
+
+/* Links */
+a {
+    color: #d8d6d6;
+    text-decoration: none;
+}
+a:hover {
+    color: #f6b11a;
+}
+
+/* Buttons */
+.btn {
+    padding: 1%;
+    border: none;
+    font-size: 1rem;
+    border-radius: 5px;
+}
+.btn-primary {
+    background: linear-gradient(45deg, #f6b11a, #ffc864);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 25px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    position: relative;
+    overflow: hidden;
+    transition: all .3s ease;
+}
+.btn-primary:hover {
+    background: linear-gradient(45deg, #926c19, #b88a2c);
+    transform: scale(1.08);
+}
+
+
+/* Headings */
+h2 {
+    color: #2f3542;
+    font-size: 2rem;
+    margin-bottom: 2%;
+}
+h3 {
+    font-size: 1.5rem;
+}
+
+/* Navbar */
+.menu {
+    line-height: 60px;
+}
+.menu ul {
+    list-style: none;
+    padding-left: 0;
+}
+.menu ul li {
+    display: inline-block;
+    padding: 1%;
+    font-weight: bold;
+}
+
+/* Hero / search section */
+.food-search {
+    background: url(../../images/bgrw1.jpg) center/cover no-repeat;
+    padding: 8% 5%;
+    margin-top: -1%;
+    position: relative;
+}
+.food-search-order-part {
+    background: url(../images/burger.jpg) center/cover no-repeat;
+}
+
+/* Categories & food cards */
+.categories {
+    padding: 4% 0;
+}
+.foods-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Universal card (works on every screen) */
+.box-3,
+.food-menu-box {
+    flex: 1 1 clamp(260px, 30%, 360px);
+    max-width: 360px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 10px;
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+    transition: transform .3s ease, box-shadow .3s ease;
+    cursor: pointer;
+}
+.box-3:hover,
+.food-menu-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, .25);
+}
+
+.box-3 img,
+.food-menu-img img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 15px;
+    display: block;
+}
+
+.food-menu-img {
+    height: 200px;
+    overflow: hidden;
+}
+
+.food-menu-desc {
+    background: #1e2330;
+    color: #fff;
+    padding: 16px;
+}
+.food-menu-desc h4 {
+    font-size: 1.3rem;
+    margin: 0 0 8px;
+}
+.food-price {
+    font-size: 1.1rem;
+    margin: 8px 0;
+}
+.food-detail {
+    font-size: .9rem;
+    color: #ccc;
+    margin-bottom: 12px;
+}
+
+/* Order form */
+.order {
+    width: 50%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+.input-responsive {
+    width: 100%;
+    padding: 1%;
+    margin-bottom: 3%;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+.order-label {
+    margin-bottom: 1%;
+    font-weight: bold;
+}
+/* Categories layout – side by side */
+#category-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: stretch;
+}
+
+/* Category card */
+#category-container .box-3 {
+    flex: 1 1 280px;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+}
+
+/* ✅ PERFECT IMAGE FIX */
+#category-container .box-3 img {
+    width: 100%;
+    aspect-ratio: 4 / 3;     /* 🔥 forces equal image shape */
+    object-fit: cover;
+    border-radius: 15px;
+    display: block;
+}
+
+/* Title alignment */
+#category-container .box-3 h3 {
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    margin-top: 10px;
+}
+
+
+/* Tiny tweaks for very small screens */
+@media (max-width: 480px) {
+    .box-3 img,
+    .food-menu-img img {
+        height: 200px;
+    }
+}
