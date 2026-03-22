@@ -1,0 +1,235 @@
+Description:Complete DDL for a food-delivery platform
+
+
+-- 1. Categories (no dependencies)
+CREATE TABLE Categories (
+    category_id INT PRIMARY KEY AUTO_INCREMENT,
+    name        VARCHAR(100) NOT NULL,
+    image       VARCHAR(255),
+    active      ENUM('yes','no') DEFAULT 'yes',
+    featured    ENUM('yes','no') DEFAULT 'no',
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Unified Users (authentication + role)
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('admin','manager','waiter','delivery','customer') NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Customer (linked to Users)
+CREATE TABLE Customer (
+    cust_id INT PRIMARY KEY,
+    Fname   VARCHAR(50) NOT NULL,
+    Lname   VARCHAR(50) NOT NULL,
+    phone   VARCHAR(20),
+    address TEXT NOT NULL,
+    location POINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cust_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+-- 4. Foods (depends on Categories)
+CREATE TABLE Foods (
+    food_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL CHECK (price > 0),
+    image VARCHAR(255),
+    active ENUM('yes','no') DEFAULT 'yes',
+    featured ENUM('yes','no') DEFAULT 'no',
+    category_id INT NOT NULL,
+    preparation_time INT DEFAULT 15,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_foods_cat FOREIGN KEY (category_id) REFERENCES Categories(category_id) ON DELETE CASCADE
+);
+
+-- 5. Delivery_person (linked to Users)
+CREATE TABLE Delivery_person (
+    del_id INT PRIMARY KEY,
+    Fname VARCHAR(50) NOT NULL,
+    Lname VARCHAR(50) NOT NULL,
+    address TEXT NOT NULL,
+    status ENUM('available','busy','offline') DEFAULT 'available',
+    phone VARCHAR(20) NOT NULL,
+    vehicle_type VARCHAR(50),
+    current_location POINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (del_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+-- 6. Staff (linked to Users)
+CREATE TABLE Staff (
+    staff_id INT PRIMARY KEY,
+    Fname VARCHAR(50) NOT NULL,
+    Lname VARCHAR(50) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    address TEXT NOT NULL,
+    salary DECIMAL(10,2),
+    hire_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (staff_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+-- 7. `Order` (depends on Customer, Delivery_person)
+CREATE TABLE `Order` (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    cust_id INT NOT NULL,
+    quantity INT DEFAULT 1 CHECK (quantity > 0),
+    total_price DECIMAL(10,2) NOT NULL CHECK (total_price >= 0),
+    status ENUM('pending','confirmed','preparing','ready','out_for_delivery','delivered','cancelled') DEFAULT 'pending',
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    del_id INT,
+    delivery_address TEXT NOT NULL,
+    delivery_instructions TEXT,
+    estimated_delivery TIME,
+    actual_delivery TIMESTAMP NULL,
+    discount DECIMAL(10,2) DEFAULT 0,
+    tax DECIMAL(10,2) DEFAULT 0,
+    final_price DECIMAL(10,2) GENERATED ALWAYS AS (total_price - discount + tax) STORED,
+    CONSTRAINT fk_order_cust FOREIGN KEY (cust_id) REFERENCES Customer(cust_id) ON DELETE CASCADE,
+    CONSTRAINT fk_order_del FOREIGN KEY (del_id) REFERENCES Delivery_person(del_id) ON DELETE SET NULL,
+    INDEX idx_status (status),
+    INDEX idx_order_date (order_date)
+);
+
+-- 8. Payment_Method (depends on Order)
+CREATE TABLE Payment_Method (
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL UNIQUE,
+    method ENUM('cash','card','mobile_money','online') NOT NULL,
+    status ENUM('pending','completed','failed','refunded') DEFAULT 'pending',
+    transaction_id VARCHAR(100) UNIQUE,
+    amount_paid DECIMAL(10,2) NOT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    card_last_four VARCHAR(4),
+    cbe_txn_id VARCHAR(50) UNIQUE NULL,
+    CONSTRAINT fk_pay_order FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE,
+    INDEX idx_payment_status (status)
+);
+
+-- 9. Order_item (depends on Order, Foods)
+CREATE TABLE Order_item (
+    item_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    food_id INT NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    price DECIMAL(10,2) NOT NULL,
+    special_instructions TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_oi_order FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE,
+    CONSTRAINT fk_oi_food FOREIGN KEY (food_id) REFERENCES Foods(food_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_order_food (order_id, food_id),
+    INDEX idx_order_items (order_id)
+);
+
+-- 10. Order_Tracking (depends on Order)
+CREATE TABLE Order_Tracking (
+    track_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    status ENUM('pending','confirmed','preparing','ready','out_for_delivery','delivered','cancelled') NOT NULL,
+    notes TEXT,
+    updated_by ENUM('system','customer','staff','delivery_person') DEFAULT 'system',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_track_order FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE,
+    INDEX idx_tracking_order (order_id, created_at)
+);
+
+-- 11. Ratings_Reviews (depends on Order, Customer)
+CREATE TABLE Ratings_Reviews (
+    review_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL UNIQUE,
+    cust_id INT NOT NULL,
+    rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    review_text TEXT,
+    food_rating TINYINT CHECK (food_rating BETWEEN 1 AND 5),
+    delivery_rating TINYINT CHECK (delivery_rating BETWEEN 1 AND 5),
+    is_approved BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_rev_order FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE,
+    CONSTRAINT fk_rev_cust FOREIGN KEY (cust_id) REFERENCES Customer(cust_id) ON DELETE CASCADE,
+    INDEX idx_rating (rating),
+    INDEX idx_order_review (order_id)
+);
+
+-- 12. Complaint (depends on Customer, optionally Order & Staff)
+CREATE TABLE Complaint (
+    comp_id INT PRIMARY KEY AUTO_INCREMENT,
+    cust_id INT NOT NULL,
+    order_id INT,
+    text TEXT NOT NULL,
+    type ENUM('food_quality','delivery','service','payment','other') DEFAULT 'other',
+    status ENUM('open','in_progress','resolved','closed') DEFAULT 'open',
+    assigned_to INT,
+    resolution_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP NULL,
+    CONSTRAINT fk_comp_cust FOREIGN KEY (cust_id) REFERENCES Customer(cust_id) ON DELETE CASCADE,
+    CONSTRAINT fk_comp_order FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE SET NULL,
+    CONSTRAINT fk_comp_staff FOREIGN KEY (assigned_to) REFERENCES Staff(staff_id) ON DELETE SET NULL,
+    INDEX idx_complaint_status (status)
+);
+
+-- 13. Sales (analytic/summary table)
+CREATE TABLE Sales (
+    sale_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL UNIQUE,
+    sale_date DATE NOT NULL,
+    sale_time TIME NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    payment_method VARCHAR(50),
+    customer_id INT,
+    delivery_person_id INT,
+    items_count INT DEFAULT 1,
+    commission DECIMAL(10,2) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_sales_order FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE,
+    CONSTRAINT fk_sales_cust FOREIGN KEY (customer_id) REFERENCES Customer(cust_id) ON DELETE SET NULL,
+    CONSTRAINT fk_sales_del FOREIGN KEY (delivery_person_id) REFERENCES Delivery_person(del_id) ON DELETE SET NULL,
+    INDEX idx_sales_date (sale_date),
+    INDEX idx_sales_customer (customer_id)
+);
+
+-- 14. Password Reset (linked to Users)
+CREATE TABLE password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_token (token)
+);
+
+-- =========================================================
+-- Trigger: auto-populate Sales when order becomes delivered
+-- =========================================================
+DELIMITER $$
+CREATE TRIGGER after_order_completed
+AFTER UPDATE ON `Order`
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 'delivered' AND OLD.status <> 'delivered' THEN
+        INSERT INTO Sales (
+            order_id, sale_date, sale_time, total_amount,
+            customer_id, delivery_person_id, items_count
+        )
+        SELECT NEW.order_id,
+               DATE(NEW.order_date),
+               TIME(NEW.order_date),
+               NEW.final_price,
+               NEW.cust_id,
+               NEW.del_id,
+               COALESCE(SUM(oi.quantity), 0)
+        FROM Order_item oi
+        WHERE oi.order_id = NEW.order_id
+        GROUP BY oi.order_id;
+    END IF;
+END$$
+DELIMITER ;
